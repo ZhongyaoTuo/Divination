@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* 样式保持与之前相同，省略重复（实际使用时复制完整样式） */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0e0b14; background-image: radial-gradient(circle at 10% 20%, rgba(46,34,59,0.6) 0%, #0a0812 100%); font-family: 'Inter', sans-serif; color: #ece4e4; padding: 2rem 1.2rem; }
         .container { max-width: 720px; margin: 0 auto; }
@@ -60,7 +59,7 @@
 <div id="toastMsg" class="toast-msg"></div>
 
 <script>
-    // ==================== sheet.best 配置 ====================
+    // ==================== sheet.best 配置（您的专属 API 端点）====================
     const SHEETBEST_API = "https://api.sheetbest.com/sheets/0070b321-2e6a-4b9b-bd2c-ef0174dab86c";
 
     // DOM 元素
@@ -98,9 +97,12 @@
             showToast("请完整填写姓名、出生日期和问题", true);
             return null;
         }
-        return { name, birthDate, birthTime, bazi, question, timestamp: new Date().toISOString() };
+        // 生成当前时间戳（ISO 字符串）
+        const timestamp = new Date().toISOString();
+        return { name, birthDate, birthTime, bazi, question, timestamp };
     }
 
+    // 占卜解答库（文字游戏风格）
     function generateWisdomAnswer(name, question) {
         const answers = [
             `「金舆驻运」${name}，所问之事根基渐固，未来半年多遇良机。`,
@@ -116,6 +118,7 @@
         return answers[idx] + " —— 灵境真言";
     }
 
+    // 提交到 sheet.best，稳健处理各种成功响应
     async function submitToSheetBest(data) {
         try {
             const response = await fetch(SHEETBEST_API, {
@@ -123,29 +126,49 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-            if (!response.ok) {
-                let errText = await response.text();
-                throw new Error(`HTTP ${response.status}: ${errText}`);
+
+            // 尝试获取响应文本（便于调试）
+            const responseText = await response.text();
+            console.log("sheet.best 原始响应:", responseText);
+
+            let result;
+            try {
+                result = JSON.parse(responseText);
+            } catch (e) {
+                // 如果响应不是 JSON，但 HTTP 状态码表明成功，也视为成功
+                if (response.ok) {
+                    return { success: true, answer: generateWisdomAnswer(data.name, data.question) };
+                }
+                throw new Error(`响应不是 JSON: ${responseText}`);
             }
-            const result = await response.json();
-            // sheet.best 成功返回 { id: "..." }
-            if (result && result.id) {
+
+            // 检查 HTTP 状态码
+            if (response.ok) {
+                // 只要状态码 2xx，且没有明确的 error 字段，就认为成功
+                if (result && (result.error || result.message === "error")) {
+                    throw new Error(result.error || result.message || "未知错误");
+                }
                 return { success: true, answer: generateWisdomAnswer(data.name, data.question) };
             } else {
-                throw new Error('API 返回异常');
+                // 状态码错误
+                const errMsg = result && result.message ? result.message : `HTTP ${response.status}`;
+                throw new Error(errMsg);
             }
         } catch (err) {
-            console.error(err);
+            console.error("提交失败:", err);
             return { success: false, error: err.message };
         }
     }
 
+    // 表单提交主逻辑
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = gatherFormData();
         if (!formData) return;
+
         setLoading(true);
         answerContainer.style.display = 'none';
+
         const result = await submitToSheetBest(formData);
         if (result.success) {
             displayAnswer(result.answer);
@@ -158,7 +181,7 @@
     });
 
     window.addEventListener('load', () => {
-        console.log("灵境卜筮 · 使用 sheet.best 存储");
+        console.log("灵境卜筮 · 使用 sheet.best 存储 - 最终稳定版");
         showToast("灵境已开，恭候缘人");
     });
 </script>
