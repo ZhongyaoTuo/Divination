@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>灵境卜筮 · 天命鉴</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0e0b14;
+            background-image: radial-gradient(circle at 10% 20%, rgba(46, 34, 59, 0.6) 0%, #0a0812 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            color: #ece4e4;
+            padding: 2rem 1.2rem;
+            position: relative;
+        }
+
+        body::before {
+            content: "⚲";
+            font-size: 280px;
+            opacity: 0.03;
+            position: fixed;
+            bottom: -40px;
+            right: -60px;
+            font-family: monospace;
+            pointer-events: none;
+            transform: rotate(15deg);
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        /* 配置状态提示条 */
+        .config-banner {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 60px;
+            padding: 8px 18px;
+            margin-bottom: 1.5rem;
+            font-size: 0.75rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            border: 1px solid #cb9e5f50;
+        }
+        .config-banner i {
+            color: #f5c27b;
+        }
+        .config-banner a {
+            color: #f5c27b;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .temple-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .temple-header h1 {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 2.6rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #f5e7a7, #cb9e5f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 6px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .temple-header p {
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            color: #b8aa8c;
+            border-top: 1px solid rgba(203, 158, 95, 0.4);
+            display: inline-block;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+
+        .oracle-card {
+            background: rgba(20, 16, 29, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            border: 1px solid rgba(203, 158, 95, 0.35);
+            box-shadow: 0 25px 40px -12px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+            padding: 2rem 1.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-group {
+            margin-bottom: 1.6rem;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            margin-bottom: 0.6rem;
+            font-size: 0.9rem;
+            color: #e9ddc7;
+            letter-spacing: 1px;
+        }
+
+        label i {
+            color: #cb9e5f;
+            width: 20px;
+            font-size: 1rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            background: #1e192b;
+            border: 1px solid #3f3250;
+            border-radius: 24px;
+            padding: 12px 18px;
+            color: #f2ede4;
+            font-family: 'Inter', monospace;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #cb9e5f;
+            box-shadow: 0 0 0 3px rgba(203, 158, 95, 0.2);
+            background: #231e30;
+        }
+
+        textarea {
+            resize: vertical;
+            border-radius: 28px;
+        }
+
+        .row-2col {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .row-2col .form-group {
+            flex: 1;
+        }
+
+        .bazi-hint {
+            font-size: 0.7rem;
+            color: #b59e6e;
+            margin-top: 6px;
+            margin-left: 12px;
+        }
+
+        button {
+            background: linear-gradient(95deg, #cb9e5f 0%, #a47c44 100%);
+            border: none;
+            width: 100%;
+            padding: 14px 0;
+            font-weight: 700;
+            font-size: 1.1rem;
+            font-family: 'Noto Serif SC', serif;
+            letter-spacing: 2px;
+            color: #0e0b14;
+            border-radius: 40px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: 0.2s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button:hover {
+            background: linear-gradient(95deg, #ddb16c, #b88644);
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .answer-area {
+            margin-top: 2.2rem;
+            padding: 1.2rem 1.5rem;
+            background: rgba(0, 0, 0, 0.45);
+            border-radius: 2rem;
+            border-left: 4px solid #cb9e5f;
+            transition: 0.2s;
+        }
+
+        .answer-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #cb9e5f;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .answer-content {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: #f3e9da;
+            word-break: break-word;
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f1b2b;
+            backdrop-filter: blur(12px);
+            padding: 8px 18px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            color: #efdfb7;
+            border: 1px solid #b5925a;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.7rem;
+            margin-top: 2rem;
+            color: #7a6d5a;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 配置状态提示栏 (已配置成功) -->
+    <div id="configBanner" class="config-banner">
+        <i class="fas fa-cloud-upload-alt"></i> 
+        <span id="configStatus">⛩️ 天机阁已链接 · 命书将永存于您的 Google Sheet</span>
+    </div>
+
+    <div class="temple-header">
+        <h1>灵境卜筮</h1>
+        <p>· 窥天命 · 解惑障 ·</p>
+    </div>
+
+    <div class="oracle-card">
+        <form id="fortuneForm">
+            <div class="form-group">
+                <label><i class="fas fa-feather-alt"></i> 求问者姓名</label>
+                <input type="text" id="userName" placeholder="例：林玄清" autocomplete="off" required>
+            </div>
+
+            <div class="row-2col">
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-alt"></i> 出生日期</label>
+                    <input type="date" id="birthDate" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-moon"></i> 出生时辰</label>
+                    <select id="birthTime">
+                        <option value="子时 (23:00-01:00)">子时 (23:00-01:00)</option>
+                        <option value="丑时 (01:00-03:00)">丑时 (01:00-03:00)</option>
+                        <option value="寅时 (03:00-05:00)">寅时 (03:00-05:00)</option>
+                        <option value="卯时 (05:00-07:00)">卯时 (05:00-07:00)</option>
+                        <option value="辰时 (07:00-09:00)">辰时 (07:00-09:00)</option>
+                        <option value="巳时 (09:00-11:00)">巳时 (09:00-11:00)</option>
+                        <option value="午时 (11:00-13:00)">午时 (11:00-13:00)</option>
+                        <option value="未时 (13:00-15:00)">未时 (13:00-15:00)</option>
+                        <option value="申时 (15:00-17:00)">申时 (15:00-17:00)</option>
+                        <option value="酉时 (17:00-19:00)">酉时 (17:00-19:00)</option>
+                        <option value="戌时 (19:00-21:00)">戌时 (19:00-21:00)</option>
+                        <option value="亥时 (21:00-23:00)">亥时 (21:00-23:00)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-yin-yang"></i> 八字 (若知晓)</label>
+                <input type="text" id="bazi" placeholder="例：甲子年 丙寅月 戊午日 壬子时" autocomplete="off">
+                <div class="bazi-hint"><i class="fas fa-info-circle"></i> 如不确定可留空，依日期时辰推演</div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-comment-dots"></i> 所问何事</label>
+                <textarea rows="3" id="question" placeholder="请详述您心中的困惑、姻缘、事业、流年…… 灵境自会回应" required></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn">
+                <i class="fas fa-scroll"></i> 叩问天命 · 得解
+            </button>
+        </form>
+
+        <div id="answerContainer" class="answer-area" style="display: none;">
+            <div class="answer-title">
+                <i class="fas fa-crown"></i>  灵境真言
+            </div>
+            <div class="answer-content" id="answerText">
+                卦象未启，静候缘人。
+            </div>
+        </div>
+    </div>
+    <div class="footer-note">
+        <i class="fas fa-database"></i> 所呈命簿皆录于云端太虚（Google Sheet）· 天命可鉴
+    </div>
+</div>
+
+<div id="toastMsg" class="toast-msg"></div>
+
+<script>
+    // ============================================================
+    // 🔮 灵境卜筮 · 完整前端代码（已配置您的专属 Web App URL）
+    // 您的部署ID: AKfycbzP7jXdh_HQ-FiRlSb47i4chXG861qcf6hZllH3vQ_Wp_7YvMV-jlu0ZBsU7kvXgaLx
+    // Web App URL: https://script.google.com/macros/s/AKfycbzP7jXdh_HQ-FiRlSb47i4chXG861qcf6hZllH3vQ_Wp_7YvMV-jlu0ZBsU7kvXgaLx/exec
+    // ============================================================
+    
+    // ★★★★★ 已正确配置您的 Google Apps Script Web App URL ★★★★★
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzP7jXdh_HQ-FiRlSb47i4chXG861qcf6hZllH3vQ_Wp_7YvMV-jlu0ZBsU7kvXgaLx/exec";
+    
+    // 检查配置状态（已成功配置）
+    const IS_CONFIGURED = true;
+    
+    // DOM 元素
+    const form = document.getElementById('fortuneForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const answerContainer = document.getElementById('answerContainer');
+    const answerTextEl = document.getElementById('answerText');
+    const toastMsg = document.getElementById('toastMsg');
+    const configStatusSpan = document.getElementById('configStatus');
+    const configBanner = document.getElementById('configBanner');
+    
+    // 辅助显示浮动消息
+    function showToast(message, isError = false) {
+        toastMsg.innerText = message;
+        toastMsg.style.backgroundColor = isError ? '#3b2a2a' : '#1f1b2b';
+        toastMsg.style.borderColor = isError ? '#c25b5b' : '#b5925a';
+        toastMsg.style.opacity = '1';
+        setTimeout(() => {
+            toastMsg.style.opacity = '0';
+        }, 3000);
+    }
+    
+    // 显示占卜解答
+    function displayAnswer(answerText) {
+        answerTextEl.innerText = answerText;
+        answerContainer.style.display = 'block';
+        answerContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    
+    // 设置按钮loading状态
+    function setLoading(loading) {
+        if (loading) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> 叩问天机中...';
+        } else {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-scroll"></i> 叩问天命 · 得解';
+        }
+    }
+    
+    // 收集表单数据
+    function gatherFormData() {
+        const name = document.getElementById('userName').value.trim();
+        const birthDate = document.getElementById('birthDate').value;
+        const birthTime = document.getElementById('birthTime').value;
+        const bazi = document.getElementById('bazi').value.trim() || "未提供（依出生日时）";
+        const question = document.getElementById('question').value.trim();
+        
+        if (!name) {
+            showToast("请告知求问者姓名", true);
+            return null;
+        }
+        if (!birthDate) {
+            showToast("请选择出生日期", true);
+            return null;
+        }
+        if (!question) {
+            showToast("请写下您想咨询的问题", true);
+            return null;
+        }
+        
+        return {
+            name: name,
+            birthDate: birthDate,
+            birthTime: birthTime,
+            bazi: bazi,
+            question: question,
+            timestamp: new Date().toISOString()
+        };
+    }
+    
+    // 提交到 Google Apps Script (真实存储)
+    async function submitToGoogleSheets(formData) {
+        try {
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            const result = await response.json();
+            if (result && result.success === true) {
+                return { success: true, answer: result.answer };
+            } else {
+                throw new Error(result.message || '灵境响应异常');
+            }
+        } catch (err) {
+            console.error("提交失败:", err);
+            showToast("连接天机阁失败，请检查网络或稍后再试", true);
+            return { success: false, error: err.message };
+        }
+    }
+    
+    // 表单提交主逻辑
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = gatherFormData();
+        if (!formData) return;
+        
+        setLoading(true);
+        answerContainer.style.display = 'none';
+        
+        const result = await submitToGoogleSheets(formData);
+        
+        if (result && result.success) {
+            displayAnswer(result.answer);
+            showToast("✓ 命书已入天机册，灵境真言已现");
+        } else {
+            displayAnswer("卦象暂晦，灵机受阻。请稍后再叩问，天机不可轻泄。");
+            showToast(result?.error || "占卜失败，请稍后再试", true);
+        }
+        
+        setLoading(false);
+    });
+    
+    // 设置配置横幅为已就绪状态
+    configStatusSpan.innerHTML = '<i class="fas fa-check-circle"></i> 天机阁已链接 · 命书将永存于您的 Google Sheet';
+    configBanner.style.borderColor = '#7cb55e';
+    configBanner.style.background = 'rgba(50, 70, 40, 0.5)';
+    
+    // 页面加载完成后的提示
+    window.addEventListener('load', () => {
+        console.log("灵境卜筮 · 天命之眼已开 | 后端已就绪");
+        showToast("灵境已开，恭候缘人", false);
+    });
+</script>
+
+<!-- *********************************************** -->
+<!-- 后端备注：您已在 Apps Script 中部署了配套代码，数据将自动写入 Google Sheet 的「灵境命簿」工作表 -->
+<!-- 如需修改占卜解答文字，请编辑 Apps Script 中的 generateDivineAnswer 函数并重新部署 -->
+<!-- *********************************************** -->
+</body>
+</html>
